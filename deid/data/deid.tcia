@@ -1,0 +1,762 @@
+FORMAT dicom
+
+%header
+
+var dateinc -9999
+var uidroot 2.25
+
+REMOVE AffectedSOPInstanceUID
+ADD RequestedSOPInstanceUID "func:hashuid(RequestedSOPInstanceUID, var:uidroot)"
+ADD MediaStorageSOPInstanceUID "func:hashuid(MediaStorageSOPInstanceUID, var:uidroot)"
+ADD ReferencedSOPInstanceUIDinFile "func:hashuid(ReferencedSOPInstanceUIDinFile, var:uidroot)"
+ADD InstanceCreationDate "func:jday(InstanceCreationDate, var:dateinc)"
+# KEEP InstanceCreationTime
+ADD InstanceCreatorUID "func:hashuid(InstanceCreatorUID, var:uidroot)"
+ADD InstanceCoercionDateTime "func:jday(InstanceCoercionDateTime, var:dateinc)"
+ADD AcquisitionUID "func:hashuid(AcquisitionUID, var:uidroot)"
+ADD SOPInstanceUID "func:hashuid(SOPInstanceUID, var:uidroot)"
+ADD PyramidUID "func:hashuid(PyramidUID, var:uidroot)"
+ADD StudyDate "func:jday(StudyDate, var:dateinc)"
+ADD SeriesDate "func:jday(SeriesDate, var:dateinc)"
+ADD AcquisitionDate "func:jday(AcquisitionDate, var:dateinc)"
+ADD ContentDate "func:jday(ContentDate, var:dateinc)"
+ADD OverlayDate "func:jday(OverlayDate, var:dateinc)"
+ADD CurveDate "func:jday(CurveDate, var:dateinc)"
+ADD AcquisitionDateTime "func:jday(AcquisitionDateTime, var:dateinc)"
+# KEEP StudyTime
+# KEEP SeriesTime
+# KEEP AcquisitionTime
+# KEEP ContentTime
+# KEEP OverlayTime
+# KEEP CurveTime
+ADD AccessionNumber ""
+ADD FailedSOPInstanceUIDList "func:hashuid(FailedSOPInstanceUIDList, var:uidroot)"
+REMOVE InstitutionName
+REMOVE InstitutionAddress
+REMOVE InstitutionCodeSequence
+ADD ReferringPhysicianName ""
+REMOVE ReferringPhysicianAddress
+REMOVE ReferringPhysicianTelephoneNumbers
+REMOVE ReferringPhysicianIdentificationSequence
+ADD ConsultingPhysicianName ""
+REMOVE ConsultingPhysicianIdentificationSequence
+# KEEP ContextGroupVersion
+# KEEP ContextGroupLocalVersion
+REMOVE TimezoneOffsetFromUTC
+REMOVE StationName
+# KEEP StudyDescription
+# KEEP SeriesDescription
+REMOVE InstitutionalDepartmentName
+REMOVE InstitutionalDepartmentTypeCodeSequence
+REMOVE PhysiciansOfRecord
+REMOVE PhysiciansOfRecordIdentificationSequence
+REMOVE PerformingPhysicianName
+REMOVE PerformingPhysicianIdentificationSequence
+REMOVE NameOfPhysiciansReadingStudy
+REMOVE PhysiciansReadingStudyIdentificationSequence
+REMOVE OperatorsName
+REMOVE OperatorIdentificationSequence
+# KEEP AdmittingDiagnosesDescription
+# @process AdmittingDiagnosesCodeSequence
+# KEEP PyramidDescription
+# @process ReferencedStudySequence
+# @process ReferencedPerformedProcedureStepSequence
+REMOVE ReferencedPatientSequence
+# @process ReferencedImageSequence
+ADD ReferencedSOPInstanceUID "func:hashuid(ReferencedSOPInstanceUID, var:uidroot)"
+ADD TransactionUID "func:hashuid(TransactionUID, var:uidroot)"
+REMOVE DerivationDescription
+# @process SourceImageSequence
+ADD IrradiationEventUID "func:hashuid(IrradiationEventUID, var:uidroot)"
+REMOVE IdentifyingComments
+ADD PatientName "func:lookup(PatientID,ptid)"
+ADD PatientID "func:lookup(PatientID,ptid)"
+REMOVE IssuerOfPatientID
+ADD PatientBirthDate ""
+REMOVE PatientBirthTime
+# KEEP PatientSex
+REMOVE PatientInsurancePlanCodeSequence
+REMOVE PatientPrimaryLanguageCodeSequence
+REMOVE PatientPrimaryLanguageModifierCodeSequence
+REMOVE OtherPatientIDs
+REMOVE OtherPatientNames
+REMOVE OtherPatientIDsSequence
+REMOVE PatientBirthName
+# KEEP PatientAge
+# KEEP PatientSize
+# KEEP PatientWeight
+REMOVE PatientAddress
+REMOVE InsurancePlanIdentification
+REMOVE PatientMotherBirthName
+REMOVE MilitaryRank
+REMOVE BranchOfService
+REMOVE MedicalRecordLocator
+REMOVE ReferencedPatientPhotoSequence
+# KEEP MedicalAlerts
+REMOVE Allergies
+REMOVE CountryOfResidence
+REMOVE RegionOfResidence
+REMOVE PatientTelephoneNumbers
+REMOVE PatientTelecomInformation
+# KEEP EthnicGroup
+REMOVE Occupation
+# KEEP SmokingStatus
+# KEEP AdditionalPatientHistory
+# KEEP PregnancyStatus
+ADD LastMenstrualDate "func:jday(LastMenstrualDate, var:dateinc)"
+REMOVE PatientReligiousPreference
+# KEEP PatientSexNeutered
+REMOVE ResponsiblePerson
+REMOVE ResponsibleOrganization
+REMOVE PatientComments
+REMOVE ClinicalTrialSponsorName
+REMOVE ClinicalTrialProtocolID
+ADD ClinicalTrialProtocolName ""
+ADD ClinicalTrialSiteID ""
+ADD ClinicalTrialSiteName ""
+REMOVE ClinicalTrialSubjectID
+REMOVE ClinicalTrialSubjectReadingID
+ADD ClinicalTrialTimePointID ""
+# KEEP ClinicalTrialTimePointDescription
+ADD ClinicalTrialCoordinatingCenterName ""
+REMOVE ClinicalTrialSeriesID
+# KEEP ClinicalTrialSeriesDescription
+REMOVE ClinicalTrialProtocolEthicsCommitteeName
+REMOVE ClinicalTrialProtocolEthicsCommitteeApprovalNumber
+ADD EthicsCommitteeApprovalEffectivenessStartDate "func:jday(EthicsCommitteeApprovalEffectivenessStartDate, var:dateinc)"
+ADD EthicsCommitteeApprovalEffectivenessEndDate "func:jday(EthicsCommitteeApprovalEffectivenessEndDate, var:dateinc)"
+# KEEP CalibrationTime
+ADD CalibrationDate "func:jday(CalibrationDate, var:dateinc)"
+# KEEP MakerNote
+# KEEP DeviceSettingDescription
+REMOVE CameraOwnerName
+REMOVE LensSpecification
+REMOVE LensMake
+REMOVE LensModel
+REMOVE LensSerialNumber
+REMOVE GPSVersionID
+REMOVE GPSLatitudeRef
+REMOVE GPSLatitude
+REMOVE GPSLongitudeRef
+REMOVE GPSLongitude
+REMOVE GPSAltitudeRef
+REMOVE GPSAltitude
+REMOVE GPSTimeStamp
+REMOVE GPSSatellites
+REMOVE GPSStatus
+REMOVE GPSMeasureMode
+REMOVE GPSDOP
+REMOVE GPSSpeedRef
+REMOVE GPSSpeed
+REMOVE GPSTrackRef
+REMOVE GPSTrack
+REMOVE GPSImgDirectionRef
+REMOVE GPSImgDirection
+REMOVE GPSMapDatum
+REMOVE GPSDestLatitudeRef
+REMOVE GPSDestLatitude
+REMOVE GPSDestLongitudeRef
+REMOVE GPSDestLongitude
+REMOVE GPSDestBearingRef
+REMOVE GPSDestBearing
+REMOVE GPSDestDistanceRef
+REMOVE GPSDestDistance
+REMOVE GPSProcessingMethod
+REMOVE GPSAreaInformation
+ADD GPSDateStamp "func:jday(GPSDateStamp, var:dateinc)"
+REMOVE GPSDifferential
+# KEEP ContrastBolusAgent
+# KEEP InterventionDrugStopTime
+# KEEP InterventionDrugStartTime
+REMOVE DeviceSerialNumber
+ADD DeviceUID "func:hashuid(DeviceUID, var:uidroot)"
+REMOVE PlateID
+REMOVE GeneratorID
+REMOVE CassetteID
+REMOVE GantryID
+REMOVE UniqueDeviceIdentifier
+REMOVE UDISequence
+ADD ManufacturerDeviceClassUID "func:hashuid(ManufacturerDeviceClassUID, var:uidroot)"
+ADD DateOfSecondaryCapture "func:jday(DateOfSecondaryCapture, var:dateinc)"
+# KEEP TimeOfSecondaryCapture
+# KEEP ProtocolName
+# KEEP ContrastBolusStartTime
+# KEEP ContrastBolusStopTime
+# KEEP RadiopharmaceuticalStartTime
+# KEEP RadiopharmaceuticalStopTime
+ADD RadiopharmaceuticalStartDateTime "func:jday(RadiopharmaceuticalStartDateTime, var:dateinc)"
+ADD RadiopharmaceuticalStopDateTime "func:jday(RadiopharmaceuticalStopDateTime, var:dateinc)"
+# KEEP AcquisitionFieldOfViewLabel
+REMOVE DateOfLastCalibration
+REMOVE TimeOfLastCalibration
+ADD DateTimeOfLastCalibration "func:jday(DateTimeOfLastCalibration, var:dateinc)"
+ADD CalibrationDateTime "func:jday(CalibrationDateTime, var:dateinc)"
+# KEEP AcquisitionDeviceProcessingDescription
+ADD TargetUID "func:hashuid(TargetUID, var:uidroot)"
+# KEEP AcquisitionComments
+REMOVE TransducerIdentificationSequence
+REMOVE DetectorID
+ADD DateOfLastDetectorCalibration "func:jday(DateOfLastDetectorCalibration, var:dateinc)"
+# KEEP TimeOfLastDetectorCalibration
+ADD FrameAcquisitionDateTime "func:jday(FrameAcquisitionDateTime, var:dateinc)"
+ADD FrameReferenceDateTime "func:jday(FrameReferenceDateTime, var:dateinc)"
+# KEEP RespiratoryMotionCompensationTechniqueDescription
+REMOVE XRaySourceID
+ADD SourceStartDateTime "func:jday(SourceStartDateTime, var:dateinc)"
+ADD SourceEndDateTime "func:jday(SourceEndDateTime, var:dateinc)"
+REMOVE XRayDetectorID
+REMOVE XRayDetectorLabel
+# KEEP MultienergyAcquisitionDescription
+# KEEP DecompositionDescription
+# KEEP AcquisitionProtocolDescription
+ADD StartAcquisitionDateTime "func:jday(StartAcquisitionDateTime, var:dateinc)"
+ADD EndAcquisitionDateTime "func:jday(EndAcquisitionDateTime, var:dateinc)"
+# KEEP FunctionalSyncPulse
+ADD DecayCorrectionDateTime "func:jday(DecayCorrectionDateTime, var:dateinc)"
+ADD ExclusionStartDateTime "func:jday(ExclusionStartDateTime, var:dateinc)"
+ADD InstructionPerformedDateTime "func:jday(InstructionPerformedDateTime, var:dateinc)"
+# KEEP RequestedSeriesDescription
+ADD ContributionDateTime "func:jday(ContributionDateTime, var:dateinc)"
+# KEEP ContributionDescription
+ADD StudyInstanceUID "func:hashuid(StudyInstanceUID, var:uidroot)"
+ADD SeriesInstanceUID "func:hashuid(SeriesInstanceUID, var:uidroot)"
+ADD StudyID ""
+# KEEP PyramidLabel
+ADD FrameOfReferenceUID "func:hashuid(FrameOfReferenceUID, var:uidroot)"
+ADD SynchronizationFrameOfReferenceUID "func:hashuid(SynchronizationFrameOfReferenceUID, var:uidroot)"
+REMOVE ModifyingDeviceID
+ADD ModifiedImageDate "func:jday(ModifiedImageDate, var:dateinc)"
+# KEEP ModifiedImageTime
+REMOVE ModifiedImageDescription
+REMOVE ImageComments
+REMOVE FrameComments
+ADD ConcatenationUID "func:hashuid(ConcatenationUID, var:uidroot)"
+ADD DimensionOrganizationUID "func:hashuid(DimensionOrganizationUID, var:uidroot)"
+ADD PaletteColorLookupTableUID "func:hashuid(PaletteColorLookupTableUID, var:uidroot)"
+ADD LargePaletteColorLookupTableUID "func:hashuid(LargePaletteColorLookupTableUID, var:uidroot)"
+REMOVE ImagePresentationComments
+REMOVE StudyIDIssuer
+ADD StudyVerifiedDate "func:jday(StudyVerifiedDate, var:dateinc)"
+# KEEP StudyVerifiedTime
+ADD StudyReadDate "func:jday(StudyReadDate, var:dateinc)"
+# KEEP StudyReadTime
+ADD ScheduledStudyStartDate "func:jday(ScheduledStudyStartDate, var:dateinc)"
+# KEEP ScheduledStudyStartTime
+ADD ScheduledStudyStopDate "func:jday(ScheduledStudyStopDate, var:dateinc)"
+# KEEP ScheduledStudyStopTime
+REMOVE ScheduledStudyLocation
+REMOVE ScheduledStudyLocationAETitle
+# KEEP ReasonForStudy
+REMOVE RequestingPhysician
+REMOVE RequestingService
+ADD StudyArrivalDate "func:jday(StudyArrivalDate, var:dateinc)"
+# KEEP StudyArrivalTime
+ADD StudyCompletionDate "func:jday(StudyCompletionDate, var:dateinc)"
+# KEEP StudyCompletionTime
+# KEEP RequestedProcedureDescription
+REMOVE ReasonForVisit
+REMOVE ReasonForVisitCodeSequence
+# KEEP RequestedContrastAgent
+REMOVE StudyComments
+# @process FlowIdentifierSequence
+REMOVE FlowIdentifier
+REMOVE SourceIdentifier
+REMOVE FrameOriginTimestamp
+REMOVE ReferencedPatientAliasSequence
+REMOVE AdmissionID
+REMOVE IssuerOfAdmissionID
+REMOVE IssuerOfAdmissionIDSequence
+ADD ScheduledAdmissionDate "func:jday(ScheduledAdmissionDate, var:dateinc)"
+# KEEP ScheduledAdmissionTime
+ADD ScheduledDischargeDate "func:jday(ScheduledDischargeDate, var:dateinc)"
+# KEEP ScheduledDischargeTime
+REMOVE ScheduledPatientInstitutionResidence
+ADD AdmittingDate "func:jday(AdmittingDate, var:dateinc)"
+# KEEP AdmittingTime
+ADD DischargeDate "func:jday(DischargeDate, var:dateinc)"
+# KEEP DischargeTime
+# KEEP DischargeDiagnosisDescription
+REMOVE SpecialNeeds
+REMOVE ServiceEpisodeID
+REMOVE IssuerOfServiceEpisodeID
+# KEEP ServiceEpisodeDescription
+REMOVE IssuerOfServiceEpisodeIDSequence
+REMOVE CurrentPatientLocation
+REMOVE PatientInstitutionResidence
+REMOVE PatientState
+REMOVE VisitComments
+ADD MultiplexGroupUID "func:hashuid(MultiplexGroupUID, var:uidroot)"
+ADD ImpedanceMeasurementDateTime "func:jday(ImpedanceMeasurementDateTime, var:dateinc)"
+# KEEP WaveformFilterDescription
+# KEEP FilterLookupTableDescription
+REMOVE ScheduledStationAETitle
+ADD ScheduledProcedureStepStartDate "func:jday(ScheduledProcedureStepStartDate, var:dateinc)"
+# KEEP ScheduledProcedureStepStartTime
+ADD ScheduledProcedureStepEndDate "func:jday(ScheduledProcedureStepEndDate, var:dateinc)"
+# KEEP ScheduledProcedureStepEndTime
+REMOVE ScheduledPerformingPhysicianName
+# KEEP ScheduledProcedureStepDescription
+REMOVE ScheduledProcedureStepID
+REMOVE ScheduledPerformingPhysicianIdentificationSequence
+REMOVE ScheduledStationName
+REMOVE ScheduledProcedureStepLocation
+# KEEP PreMedication
+REMOVE PerformedStationAETitle
+REMOVE PerformedStationName
+REMOVE PerformedLocation
+ADD PerformedProcedureStepStartDate "func:jday(PerformedProcedureStepStartDate, var:dateinc)"
+# KEEP PerformedProcedureStepStartTime
+ADD PerformedProcedureStepEndDate "func:jday(PerformedProcedureStepEndDate, var:dateinc)"
+# KEEP PerformedProcedureStepEndTime
+REMOVE PerformedProcedureStepID
+# KEEP PerformedProcedureStepDescription
+REMOVE RequestAttributesSequence
+REMOVE CommentsOnThePerformedProcedureStep
+REMOVE CommentsOnRadiationDose
+REMOVE SpecimenAccessionNumber
+REMOVE ContainerIdentifier
+# @process IssuerOfTheContainerIdentifierSequence
+# KEEP ContainerDescription
+REMOVE SpecimenIdentifier
+ADD SpecimenUID "func:hashuid(SpecimenUID, var:uidroot)"
+# @process AcquisitionContextSequence
+# @process IssuerOfTheSpecimenIdentifierSequence
+# KEEP SpecimenShortDescription
+# KEEP SpecimenDetailedDescription
+# @process SpecimenPreparationSequence
+REMOVE SlideIdentifier
+REMOVE RequestedProcedureID
+REMOVE ReasonForTheRequestedProcedure
+REMOVE PatientTransportArrangements
+REMOVE RequestedProcedureLocation
+REMOVE ReasonForRequestedProcedureCodeSequence
+REMOVE NamesOfIntendedRecipientsOfResults
+REMOVE IntendedRecipientsOfResultsIdentificationSequence
+REMOVE PersonIdentificationCodeSequence
+REMOVE PersonAddress
+REMOVE PersonTelephoneNumbers
+REMOVE PersonTelecomInformation
+REMOVE RequestedProcedureComments
+REMOVE ReasonForTheImagingServiceRequest
+ADD IssueDateOfImagingServiceRequest "func:jday(IssueDateOfImagingServiceRequest, var:dateinc)"
+# KEEP IssueTimeOfImagingServiceRequest
+REMOVE OrderEnteredBy
+REMOVE OrderEntererLocation
+REMOVE OrderCallbackPhoneNumber
+REMOVE OrderCallbackTelecomInformation
+ADD PlacerOrderNumberImagingServiceRequest ""
+ADD FillerOrderNumberImagingServiceRequest ""
+# KEEP ImagingServiceRequestComments
+REMOVE ConfidentialityConstraintOnPatientDataDescription
+ADD ScheduledProcedureStepStartDateTime "func:jday(ScheduledProcedureStepStartDateTime, var:dateinc)"
+ADD ScheduledProcedureStepExpirationDateTime "func:jday(ScheduledProcedureStepExpirationDateTime, var:dateinc)"
+ADD ScheduledProcedureStepModificationDateTime "func:jday(ScheduledProcedureStepModificationDateTime, var:dateinc)"
+ADD ExpectedCompletionDateTime "func:jday(ExpectedCompletionDateTime, var:dateinc)"
+ADD ReferencedGeneralPurposeScheduledProcedureStepTransactionUID "func:hashuid(ReferencedGeneralPurposeScheduledProcedureStepTransactionUID, var:uidroot)"
+REMOVE ScheduledStationNameCodeSequence
+REMOVE ScheduledStationGeographicLocationCodeSequence
+REMOVE PerformedStationNameCodeSequence
+REMOVE PerformedStationGeographicLocationCodeSequence
+REMOVE ScheduledHumanPerformersSequence
+REMOVE ActualHumanPerformersSequence
+REMOVE HumanPerformerOrganization
+REMOVE HumanPerformerName
+ADD PerformedProcedureStepStartDateTime "func:jday(PerformedProcedureStepStartDateTime, var:dateinc)"
+ADD PerformedProcedureStepEndDateTime "func:jday(PerformedProcedureStepEndDateTime, var:dateinc)"
+ADD ProcedureStepCancellationDateTime "func:jday(ProcedureStepCancellationDateTime, var:dateinc)"
+ADD FindingsGroupRecordingDateTrial "func:jday(FindingsGroupRecordingDateTrial, var:dateinc)"
+ADD FindingsGroupRecordingTimeTrial "func:jday(FindingsGroupRecordingTimeTrial, var:dateinc)"
+REMOVE VerifyingOrganization
+ADD VerificationDateTime "func:jday(VerificationDateTime, var:dateinc)"
+ADD ObservationDateTime "func:jday(ObservationDateTime, var:dateinc)"
+ADD ObservationStartDateTime "func:jday(ObservationStartDateTime, var:dateinc)"
+# @process VerifyingObserverSequence
+REMOVE VerifyingObserverName
+REMOVE AuthorObserverSequence
+REMOVE ParticipantSequence
+REMOVE CustodialOrganizationSequence
+ADD ParticipationDateTime "func:jday(ParticipationDateTime, var:dateinc)"
+REMOVE VerifyingObserverIdentificationCodeSequence
+ADD DateOfDocumentOrVerbalTransactionTrial "func:jday(DateOfDocumentOrVerbalTransactionTrial, var:dateinc)"
+# KEEP TimeOfDocumentCreationOrVerbalTransactionTrial
+ADD DateTime "func:jday(DateTime, var:dateinc)"
+ADD Date "func:jday(Date, var:dateinc)"
+# KEEP Time
+REMOVE PersonName
+ADD UID "func:hashuid(UID, var:uidroot)"
+ADD ReferencedDateTime "func:jday(ReferencedDateTime, var:dateinc)"
+ADD ObservationUID "func:hashuid(ObservationUID, var:uidroot)"
+ADD ReferencedObservationUIDTrial "func:hashuid(ReferencedObservationUIDTrial, var:uidroot)"
+ADD ObservationDateTrial "func:jday(ObservationDateTrial, var:dateinc)"
+# KEEP ObservationTimeTrial
+REMOVE CurrentObserverTrial
+REMOVE VerbalSourceTrial
+REMOVE AddressTrial
+REMOVE TelephoneNumberTrial
+REMOVE VerbalSourceIdentifierCodeSequenceTrial
+ADD ObservationSubjectUIDTrial "func:hashuid(ObservationSubjectUIDTrial, var:uidroot)"
+# @process ContentSequence
+# KEEP TemplateVersion
+# KEEP TemplateLocalVersion
+ADD TemplateExtensionOrganizationUID "func:hashuid(TemplateExtensionOrganizationUID, var:uidroot)"
+ADD TemplateExtensionCreatorUID "func:hashuid(TemplateExtensionCreatorUID, var:uidroot)"
+# KEEP HL7DocumentEffectiveTime
+REMOVE EncapsulatedDocument
+ADD ApprovalStatusDateTime "func:jday(ApprovalStatusDateTime, var:dateinc)"
+ADD ProductExpirationDateTime "func:jday(ProductExpirationDateTime, var:dateinc)"
+ADD SubstanceAdministrationDateTime "func:jday(SubstanceAdministrationDateTime, var:dateinc)"
+ADD AssertionDateTime "func:jday(AssertionDateTime, var:dateinc)"
+ADD AssertionExpirationDateTime "func:jday(AssertionExpirationDateTime, var:dateinc)"
+REMOVE ContainerComponentID
+REMOVE DeviceDescription
+# KEEP LongDeviceDescription
+ADD TrackingUID "func:hashuid(TrackingUID, var:uidroot)"
+ADD EffectiveDateTime "func:jday(EffectiveDateTime, var:dateinc)"
+ADD InformationIssueDateTime "func:jday(InformationIssueDateTime, var:dateinc)"
+ADD AnnotationGroupUID "func:hashuid(AnnotationGroupUID, var:uidroot)"
+# KEEP AnnotationGroupLabel
+# KEEP AnnotationGroupDescription
+REMOVE GraphicAnnotationSequence
+ADD PresentationCreationDate "func:jday(PresentationCreationDate, var:dateinc)"
+# KEEP PresentationCreationTime
+ADD ContentCreatorName ""
+REMOVE ContentCreatorIdentificationCodeSequence
+ADD FiducialUID "func:hashuid(FiducialUID, var:uidroot)"
+ADD PresentationDisplayCollectionUID "func:hashuid(PresentationDisplayCollectionUID, var:uidroot)"
+ADD PresentationSequenceCollectionUID "func:hashuid(PresentationSequenceCollectionUID, var:uidroot)"
+# KEEP HangingProtocolCreationDateTime
+# KEEP SelectorASValue
+# KEEP SelectorDAValue
+# KEEP SelectorDTValue
+REMOVE SelectorOBValue
+# KEEP SelectorLOValue
+# KEEP SelectorLTValue
+REMOVE SelectorPNValue
+# KEEP SelectorTMValue
+# KEEP SelectorSHValue
+REMOVE SelectorUNValue
+# KEEP SelectorSTValue
+# KEEP SelectorUTValue
+REMOVE SelectorURValue
+ADD StorageMediaFileSetUID "func:hashuid(StorageMediaFileSetUID, var:uidroot)"
+REMOVE IconImageSequence
+REMOVE TopicTitle
+REMOVE TopicSubject
+REMOVE TopicAuthor
+REMOVE TopicKeywords
+ADD SOPAuthorizationDateTime "func:jday(SOPAuthorizationDateTime, var:dateinc)"
+ADD DigitalSignatureUID "func:hashuid(DigitalSignatureUID, var:uidroot)"
+ADD DigitalSignatureDateTime "func:jday(DigitalSignatureDateTime, var:dateinc)"
+REMOVE CertificateOfSigner
+REMOVE CertifiedTimestamp
+REMOVE ReferencedDigitalSignatureSequence
+REMOVE ReferencedSOPInstanceMACSequence
+REMOVE MAC
+REMOVE ModifiedAttributesSequence
+REMOVE NonconformingModifiedAttributesSequence
+REMOVE NonconformingDataElementValue
+REMOVE OriginalAttributesSequence
+ADD AttributeModificationDateTime "func:jday(AttributeModificationDateTime, var:dateinc)"
+REMOVE ModifyingSystem
+ADD SourceOfPreviousValues ""
+# KEEP ReasonForTheAttributeModification
+REMOVE InstanceOriginStatus
+REMOVE TextString
+ADD CreationDate "func:jday(CreationDate, var:dateinc)"
+# KEEP CreationTime
+# KEEP LabelText
+ADD BarcodeValue ""
+# KEEP StructureSetLabel
+# KEEP StructureSetName
+# KEEP StructureSetDescription
+ADD StructureSetDate "func:jday(StructureSetDate, var:dateinc)"
+# KEEP StructureSetTime
+ADD ReferencedFrameOfReferenceUID "func:hashuid(ReferencedFrameOfReferenceUID, var:uidroot)"
+# KEEP ROIName
+# KEEP ROIDescription
+# KEEP ROIGenerationDescription
+# KEEP ROIObservationLabel
+# KEEP ROIObservationDescription
+ADD ROIInterpreter ""
+ADD RelatedFrameOfReferenceUID "func:hashuid(RelatedFrameOfReferenceUID, var:uidroot)"
+ADD TreatmentControlPointDate "func:jday(TreatmentControlPointDate, var:dateinc)"
+# KEEP TreatmentControlPointTime
+ADD FirstTreatmentDate "func:jday(FirstTreatmentDate, var:dateinc)"
+ADD MostRecentTreatmentDate "func:jday(MostRecentTreatmentDate, var:dateinc)"
+ADD SourceSerialNumber ""
+ADD SafePositionExitDate "func:jday(SafePositionExitDate, var:dateinc)"
+# KEEP SafePositionExitTime
+ADD SafePositionReturnDate "func:jday(SafePositionReturnDate, var:dateinc)"
+# KEEP SafePositionReturnTime
+ADD TreatmentDate "func:jday(TreatmentDate, var:dateinc)"
+# KEEP TreatmentTime
+# KEEP RTPlanLabel
+# KEEP RTPlanName
+# KEEP RTPlanDescription
+ADD RTPlanDate "func:jday(RTPlanDate, var:dateinc)"
+# KEEP RTPlanTime
+# KEEP TreatmentSites
+# KEEP PrescriptionDescription
+ADD DoseReferenceUID "func:hashuid(DoseReferenceUID, var:uidroot)"
+# KEEP DoseReferenceDescription
+# KEEP FractionGroupDescription
+ADD ReferencedDoseReferenceUID "func:hashuid(ReferencedDoseReferenceUID, var:uidroot)"
+ADD TreatmentMachineName ""
+# KEEP BeamDescription
+# KEEP BolusDescription
+# KEEP FixationDeviceDescription
+# KEEP ShieldingDeviceDescription
+# KEEP SetupTechniqueDescription
+REMOVE SourceManufacturer
+ADD SourceStrengthReferenceDate "func:jday(SourceStrengthReferenceDate, var:dateinc)"
+# KEEP SourceStrengthReferenceTime
+# KEEP CompensatorDescription
+# KEEP TreatmentPositionGroupLabel
+ADD TreatmentPositionGroupUID "func:hashuid(TreatmentPositionGroupUID, var:uidroot)"
+ADD RTAccessoryHolderSlotID ""
+ADD RTAccessoryDeviceSlotID ""
+# KEEP RadiationDoseIdentificationLabel
+# KEEP RadiationDoseInVivoMeasurementLabel
+# KEEP RTToleranceSetLabel
+ADD PatientSetupUID "func:hashuid(PatientSetupUID, var:uidroot)"
+# KEEP EquipmentFrameOfReferenceDescription
+# KEEP RadiationGenerationModeLabel
+# KEEP RadiationGenerationModeDescription
+ADD TreatmentSessionUID "func:hashuid(TreatmentSessionUID, var:uidroot)"
+# KEEP TreatmentToleranceViolationDescription
+ADD TreatmentToleranceViolationDateTime "func:jday(TreatmentToleranceViolationDateTime, var:dateinc)"
+ADD RecordedRTControlPointDateTime "func:jday(RecordedRTControlPointDateTime, var:dateinc)"
+ADD InterlockDateTime "func:jday(InterlockDateTime, var:dateinc)"
+# KEEP InterlockDescription
+ADD OverrideDateTime "func:jday(OverrideDateTime, var:dateinc)"
+# KEEP InterlockOriginDescription
+ADD ReferencedTreatmentPositionGroupUID "func:hashuid(ReferencedTreatmentPositionGroupUID, var:uidroot)"
+# KEEP PatientTreatmentPreparationProcedureParameterDescription
+# KEEP PatientTreatmentPreparationMethodDescription
+# KEEP PatientSetupPhotoDescription
+# KEEP DisplacementReferenceLabel
+# KEEP ReasonForOmissionDescription
+ADD BeamHoldTransitionDateTime "func:jday(BeamHoldTransitionDateTime, var:dateinc)"
+ADD ReviewDate "func:jday(ReviewDate, var:dateinc)"
+# KEEP ReviewTime
+ADD ReviewerName "func:hashname(ReviewerName,4)"
+ADD ConceptualVolumeUID "func:hashuid(ConceptualVolumeUID, var:uidroot)"
+ADD ReferencedConceptualVolumeUID "func:hashuid(ReferencedConceptualVolumeUID, var:uidroot)"
+# KEEP ConceptualVolumeCombinationDescription
+ADD ConstituentConceptualVolumeUID "func:hashuid(ConstituentConceptualVolumeUID, var:uidroot)"
+ADD SourceConceptualVolumeUID "func:hashuid(SourceConceptualVolumeUID, var:uidroot)"
+# KEEP ConceptualVolumeDescription
+ADD DeviceAlternateIdentifier ""
+REMOVE DeviceLabel
+ADD ReferencedFiducialsUID "func:hashuid(ReferencedFiducialsUID, var:uidroot)"
+# KEEP UserContentLabel
+# KEEP UserContentLongLabel
+# KEEP EntityLabel
+# KEEP EntityName
+# KEEP EntityDescription
+# KEEP EntityLongLabel
+ADD RTTreatmentPhaseUID "func:hashuid(RTTreatmentPhaseUID, var:uidroot)"
+ADD ManufacturerDeviceIdentifier ""
+ADD IntendedPhaseStartDate "func:jday(IntendedPhaseStartDate, var:dateinc)"
+ADD IntendedPhaseEndDate "func:jday(IntendedPhaseEndDate, var:dateinc)"
+# KEEP RTPrescriptionLabel
+# KEEP RTTreatmentApproachLabel
+# KEEP RTPhysicianIntentNarrative
+# KEEP ReasonForSuperseding
+# KEEP PriorTreatmentDoseDescription
+ADD DosimetricObjectiveUID "func:hashuid(DosimetricObjectiveUID, var:uidroot)"
+ADD ReferencedDosimetricObjectiveUID "func:hashuid(ReferencedDosimetricObjectiveUID, var:uidroot)"
+REMOVE TreatmentSite
+REMOVE TreatmentTechniqueNotes
+REMOVE PrescriptionNotes
+REMOVE PrescriptionNotesSequence
+# KEEP IntendedFractionStartTime
+REMOVE Arbitrary
+REMOVE TextComments
+REMOVE ResultsID
+REMOVE ResultsIDIssuer
+REMOVE InterpretationRecordedDate
+REMOVE InterpretationRecordedTime
+REMOVE InterpretationRecorder
+REMOVE InterpretationTranscriptionDate
+REMOVE InterpretationTranscriptionTime
+REMOVE InterpretationTranscriber
+# KEEP InterpretationText
+REMOVE InterpretationAuthor
+REMOVE InterpretationApproverSequence
+REMOVE InterpretationApprovalDate
+REMOVE InterpretationApprovalTime
+REMOVE PhysicianApprovingInterpretation
+# KEEP InterpretationDiagnosisDescription
+REMOVE ResultsDistributionListSequence
+REMOVE DistributionName
+REMOVE DistributionAddress
+REMOVE InterpretationID
+REMOVE InterpretationIDIssuer
+# KEEP Impressions
+# KEEP ResultsComments
+REMOVE DigitalSignaturesSequence
+REMOVE DataSetTrailingPadding
+ADD DateOfInstallation "func:jday(DateOfInstallation, var:dateinc)"
+ADD DateOfManufacture "func:jday(DateOfManufacture, var:dateinc)"
+REMOVE DestinationAE
+REMOVE NetworkID
+REMOVE Originator
+REMOVE PositionAcquisitionTemplateDescription
+REMOVE PositionAcquisitionTemplateName
+REMOVE ReceivingAE
+REMOVE RequestingAE
+REMOVE RetrieveAETitle
+REMOVE SelectorAEValue
+ADD SourceFrameOfReferenceUID "func:hashuid(SourceFrameOfReferenceUID, var:uidroot)"
+REMOVE StationAETitle
+
+# TCIA added
+ADD DeidentificationMethod "Per DICOM PS 3.15 AnnexE. Details in 0012,0064"
+ADD DeidentificationMethodCodeSequence "113100/113101/113105/113107/113108/113109/113111"
+ADD LongitudinalTemporalInformationModified "MODIFIED"
+ADD PatientIdentityRemoved "YES"
+ADD ContextGroupExtensionCreatorUID "func:hashuid(ContextGroupExtensionCreatorUID, var:uidroot)"
+ADD CreatorVersionUID "func:hashuid(CreatorVersionUID, var:uidroot)"
+# KEEP SOPClassUID
+# KEEP Manufacturer
+# KEEP ManufacturerModelName
+# KEEP ReferencedSOPClassUID
+# KEEP BodyPartExamined
+# KEEP SoftwareVersions
+# KEEP BurnedInAnnotation
+REMOVE SecondaryCaptureDeviceID
+REMOVE ModifyingDeviceManufacturer
+
+# @process CTP specific to process Sequences
+# @process ReferencedSeriesSequence
+# @process ReferencedInstanceSequence
+# @process ReferencedSOPSequence
+# @process StudiesContainingOtherReferencedInstancesSequence
+# @process RelatedSeriesSequence
+# @process ReferencedImageEvidenceSequence
+# @process DerivationImageSequence
+# @process ContributingEquipmentSequence
+# @process DimensionOrganizationSequence
+# @process DimensionIndexSequence
+# @process ExposureDoseSequence
+# @process MeasurementUnitsCodeSequence
+# @process ConceptNameCodeSequence
+# @process ConceptCodeSequence
+# @process MeasuredValueSequence
+# @process ContentTemplateSequence
+# @process RadiopharmaceuticalInformationSequence
+# @process RegistrationSequence
+# @process ReferencedFrameOfReferenceSequence
+# @process RTReferencedStudySequence
+# @process RTReferencedSeriesSequence
+# @process ContourImageSequence
+# @process StructureSetROISequence
+# @process ROIContourSequence
+# @process ContourSequence
+# @process DoseReferenceSequence
+# @process FractionGroupSequence
+# @process BeamSequence
+# @process PatientSetupSequence
+# @process IonBeamSequence
+# @process ReferencedRTPlanSequence
+# @process ReferencedBeamSequence
+# @process ReferencedReferenceImageSequence
+# @process ReferencedStructureSetSequence
+# @process PerFrameFunctionalGroupsSequence
+
+# Remove curves
+REMOVE CURVES
+
+# Remove overlays
+REMOVE OVERLAYS
+
+# Remove private groups
+REMOVE private
+
+# Remove unspecified elements
+REMOVE unspecified
+
+# Private Tag Handling Remove Known Unsafe
+REMOVE 0009xx--EMAGEON-JPEG2K-INFO
+REMOVE 0009xx--EMAGEON-STUDY-HOME
+REMOVE 0009xx--GEIIS
+REMOVE 0009xx--GEMS_GENIE_1
+REMOVE 0009xx--GEMS_IDEN_01
+REMOVE 0009xx--GEMS_PETD_01
+REMOVE 0009xx--IMBIO-JSON-REPORT-CONTENTS
+REMOVE 0009xx--SECTRA_Ident_01
+REMOVE 0009xx--SIEMENS-CT-VA1-DUMMY
+REMOVE 0009xx--SPI-RELEASE-1
+REMOVE 0009xx--Unnamed-Private-Block---10
+REMOVE 0011xx--GEMS_GENIE_1
+REMOVE 0011xx--GEMS_PETD_01
+REMOVE 0011xx--IPKCREP-2Q00-0C--TMIGA-ERPVITA-EADAT
+REMOVE 0017xx--Unnamed-Private-Block---10
+REMOVE 0019xx--GEMS_ACQU_01
+REMOVE 0019xx--SIEMENS-MR-HEADER
+REMOVE 0019xx--SIEMENS-SIENET
+REMOVE 0019xx--Unnamed-Private-Block---10
+REMOVE 0021xx--GEMS_RELA_01
+REMOVE 0021xx--SIEMENS-MED-ECAT-FILE-INFO
+REMOVE 0023xx--GEMS_STDY_01
+REMOVE 0025xx--GEMS_SERS_01
+REMOVE 0027xx--GEMS_IMAG_01
+REMOVE 0029xx--MITRA-MARKUP-1.0
+REMOVE 0029xx--MITRA-OBJECT-DOCUMENT-1.0
+REMOVE 0029xx--MITRA-PRESENTATION-1.0
+REMOVE 0029xx--SIEMENS-CSA-HEADER
+REMOVE 0029xx--SIEMENS-MEDCOM-HEADER
+REMOVE 0029xx--SIEMENS-MEDCOM-OOG
+REMOVE 0031xx--AGFA-PACS-Archive-Mirroring-1.0
+REMOVE 0031xx--MITRA-LINKED-ATTRIBUTES-1.0
+REMOVE 0033xx--GEMS_GENIE_1
+REMOVE 0033xx--MITRA-OBJECT-UTF8-ATTRIBUTES-1.0
+REMOVE 0043xx--GEMS_PARM_01
+REMOVE 0047xx--GEMS_3DSTATE_001
+REMOVE 0051xx--SIEMENS-MR-HEADER
+REMOVE 0053xx--GEHC_CT_ADVAPP_001
+REMOVE 0073xx--STENTOR
+REMOVE 0091xx--SIENET
+REMOVE 0095xx--SIENET
+REMOVE 0097xx--SIENET
+REMOVE 0099xx--SIENET
+REMOVE 00e1xx--ELSCINT1
+REMOVE 01e1xx--ELSCINT1
+REMOVE 01f1xx--ELSCINT1
+REMOVE 01f3xx--ELSCINT1
+REMOVE 01f7xx--ELSCINT1
+REMOVE 07a1xx--ELSCINT1
+REMOVE 07a3xx--ELSCINT1
+REMOVE 07a5xx--ELSCINT1
+REMOVE 0903xx--GEIIS-PACS
+REMOVE 0905xx--GEIIS
+REMOVE 1001xx--Philips-Imaging-DD-001
+REMOVE 1099xx--TABLE_HEIGHT
+REMOVE 2001xx--Philips-Imaging-DD-001
+REMOVE 2001xx--Philips-Imaging-DD-002
+REMOVE 2001xx--Philips-Imaging-DD-129
+REMOVE 2005xx--Philips-MR-Imaging-DD-001
+REMOVE 2005xx--Philips-MR-Imaging-DD-002
+REMOVE 2005xx--Philips-MR-Imaging-DD-003
+REMOVE 2005xx--Philips-MR-Imaging-DD-004
+REMOVE 2005xx--Philips-MR-Imaging-DD-005
+REMOVE 2005xx--Philips-MR-Imaging-DD-006
+REMOVE 3109xx--Applicare-RadWorks-Version-5.0
+REMOVE 3109xx--Applicare-RadWorks-Version-6.0-Summary
+REMOVE 3115xx--http:--www.gemedicalsystems.com-it_solutions-rad_pacs-
+REMOVE 3241xx--Varian-Medical-Systems-VISION-3241
+REMOVE 3253xx--Varian-Medical-Systems-VISION-3253
+REMOVE 3287xx--Varian-Medical-Systems-VISION-3287
+REMOVE 3773xx--MIM-Software-Inc.
+REMOVE 3773xx--Unnamed-Private-Block---01
+REMOVE 4453xx--DR-Systems,-Inc.
+REMOVE 7005xx--TOSHIBA_MEC_CT3
+REMOVE 7053xx--Philips-PET-Private-Group
+REMOVE 7fdfxx--ELSCINT1
+REMOVE 3263xx--Unnamed-Private-Block---10
+REMOVE 3263xx--Varian-Medical-Systems-VISION-3263
+REMOVE 3773xx--MIM-Software-Inc.
+REMOVE 3267xx--Varian-Medical-Systems-VISION-3267
+REMOVE 3249xx--Varian-Medical-Systems-VISION-3249
+REMOVE 3285xx--Varian-Medical-Systems-VISION-3285
