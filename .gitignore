@@ -42,3 +42,4 @@ Temporary Items
 
 # PyCharm
 .idea/
+/venv-pydicom-deid
