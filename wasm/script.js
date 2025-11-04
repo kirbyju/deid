@@ -25,6 +25,8 @@ async function main() {
     await micropip.install([
         'deid-0.4.7-py3-none-any.whl',
         'pydicom',
+        'numpy',
+        'python-dateutil'
     ]);
 
     await populateRecipes();
@@ -32,7 +34,6 @@ async function main() {
 }
 
 async function populateRecipes() {
-    // This Python script gets the built-in recipes from the installed deid package
     const pythonCode = `
 import os
 import json
@@ -65,7 +66,7 @@ get_deid_recipes()
         const selectedRecipe = recipeSelect.value;
         if (selectedRecipe && recipes[selectedRecipe]) {
             deidRecipeTextarea.value = recipes[selectedRecipe];
-            recipeFileInput.value = ''; // Clear file input
+            recipeFileInput.value = '';
         }
     });
 }
@@ -83,16 +84,67 @@ dicomFileInput.addEventListener('change', (e) => handleFileSelection(e.target.fi
         e.stopPropagation();
         if (eventName === 'dragover') dropZone.classList.add('hover');
         else dropZone.classList.remove('hover');
-        if (eventName === 'drop') handleFileSelection(e.dataTransfer.files);
+        if (eventName === 'drop') handleDrop(e);
     });
 });
 
+async function handleDrop(e) {
+    const items = e.dataTransfer.items;
+    const files = [];
+    const promises = [];
+
+    for (const item of items) {
+        if (item.kind === 'file') {
+            const entry = item.webkitGetAsEntry();
+            if (entry) {
+                promises.push(traverseFileTree(entry, files));
+            }
+        }
+    }
+
+    await Promise.all(promises);
+    handleFileSelection(files);
+}
+
+function traverseFileTree(entry, files) {
+    return new Promise(resolve => {
+        if (entry.isFile) {
+            entry.file(file => {
+                file.webkitRelativePath = entry.fullPath.substring(1);
+                files.push(file);
+                resolve();
+            });
+        } else if (entry.isDirectory) {
+            const dirReader = entry.createReader();
+            const readEntries = () => {
+                dirReader.readEntries(async (entries) => {
+                    if (entries.length > 0) {
+                        const promises = [];
+                        for (const subEntry of entries) {
+                            promises.push(traverseFileTree(subEntry, files));
+                        }
+                        await Promise.all(promises);
+                        readEntries();
+                    } else {
+                        resolve();
+                    }
+                });
+            };
+            readEntries();
+        }
+    });
+}
+
+
 function handleFileSelection(files) {
     if (files.length > 0) {
-        selectedFiles = Array.from(files);
-        dropZone.textContent = `${selectedFiles.length} file(s) selected from folder "${selectedFiles[0].webkitRelativePath.split('/')[0]}".`;
+        selectedFiles = files;
+        const firstPath = files[0].webkitRelativePath || files[0].name;
+        const folderName = firstPath.split('/')[0];
+        dropZone.textContent = `(${files.length}) files selected from folder "${folderName}".`;
     }
 }
+
 
 function handleRecipeFileUpload(event) {
     const file = event.target.files[0];
@@ -100,7 +152,7 @@ function handleRecipeFileUpload(event) {
         const reader = new FileReader();
         reader.onload = (e) => {
             deidRecipeTextarea.value = e.target.result;
-            recipeSelect.value = ""; // Reset dropdown
+            recipeSelect.value = "";
         };
         reader.readAsText(file);
     }
@@ -121,59 +173,72 @@ async function processFilesWithStreaming() {
     let errorLog = "";
     let filesProcessed = 0;
 
-    // 1. Prepare for streaming
     const fileStream = streamSaver.createWriteStream('deidentified_dicom.zip');
     const zipStream = new fflate.Zip((err, data, final) => {
         if (!err) {
             writer.write(data);
-            if (final) {
-                writer.close();
-            }
+            if (final) writer.close();
         } else {
             writer.abort(err);
         }
     });
     const writer = fileStream.getWriter();
 
-    // 2. Prepare Python function for single file processing
     const pythonCode = `
 import sys
 import os
-from deid.main import main
+import shutil
+from deid.dicom import clean_dicom_files
 
 def process_single_file(input_path, recipe_content):
-    output_path = "cleaned_temp.dcm"
-    recipe_path = "deid.recipe"
+    output_dir = "/cleaned"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
+    recipe_path = "deid.recipe"
     with open(recipe_path, 'w') as f:
         f.write(recipe_content)
 
-    sys.argv = ['deid', 'clean', '--deid', recipe_path, input_path, output_path]
-
     try:
-        main()
-        if os.path.exists(output_path):
-            with open(output_path, 'rb') as f:
-                return f.read()
+        cleaned_files = clean_dicom_files(
+            dicom_files=[input_path],
+            deid=recipe_path,
+            output_folder=output_dir,
+            force=True
+        )
+
+        if cleaned_files:
+            output_path = cleaned_files[0]
+            if os.path.exists(output_path):
+                with open(output_path, 'rb') as f:
+                    return f.read()
+        return "Error: Cleaned file not found."
+
     except Exception as e:
-        return str(e)
+        return f"Error: {str(e)}"
     finally:
         # Clean up virtual files
-        if os.path.exists(input_path): os.remove(input_path)
-        if os.path.exists(output_path): os.remove(output_path)
-        if os.path.exists(recipe_path): os.remove(recipe_path)
+        if os.path.exists(input_path):
+            os.remove(input_path)
+        if os.path.exists(recipe_path):
+            os.remove(recipe_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
     `;
     await pyodide.runPythonAsync(pythonCode);
     const process_single_file = pyodide.globals.get('process_single_file');
 
-    // 3. Process files one by one and stream to zip
     for (const file of selectedFiles) {
-        const filePath = file.webkitRelativePath;
+        const filePath = file.webkitRelativePath || file.name;
         statusDiv.textContent = `Processing: ${filePath}`;
 
-        // Write file to virtual FS
         const buffer = await file.arrayBuffer();
         const data = new Uint8Array(buffer);
+
+        const dir = filePath.substring(0, filePath.lastIndexOf('/'));
+        if (dir) {
+            pyodide.FS.mkdirTree(dir);
+        }
         pyodide.FS.writeFile(filePath, data);
 
         const result = await process_single_file(filePath, deidRecipe);
@@ -182,7 +247,7 @@ def process_single_file(input_path, recipe_content):
             const zipFile = new fflate.ZipPassThrough(filePath);
             zipStream.add(zipFile);
             zipFile.push(result);
-            zipFile.push(new Uint8Array(0), true); // Final chunk
+            zipFile.push(new Uint8Array(0), true);
         } else {
             const errorMessage = `Error processing ${filePath}: ${result}`;
             console.error(errorMessage);
@@ -195,7 +260,6 @@ def process_single_file(input_path, recipe_content):
         progressBar.textContent = `${progress}%`;
     }
 
-    // 4. Finalize
     if (errorLog) {
         const errorFile = new fflate.ZipPassThrough('processing_errors.log');
         zipStream.add(errorFile);
