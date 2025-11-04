@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deid WASM Interface</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        #drop-zone { border: 2px dashed #ccc; padding: 20px; text-align: center; }
+        #drop-zone.hover { border-color: #333; }
+        #results-container { margin-top: 1em; padding: 1em; border: 1px solid #ccc; }
+        #progress-bar-container { width: 100%; background-color: #f3f3f3; border: 1px solid #ccc; margin-top: 10px; }
+        #progress-bar { width: 0%; height: 30px; background-color: #4CAF50; text-align: center; line-height: 30px; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Deid WASM Interface</h1>
+    <p>Run deid recipes against your data locally in your browser. Processed files are streamed directly to a zip file on your disk to handle large datasets.</p>
+
+    <h2>1. Upload DICOM Folder</h2>
+    <div id="drop-zone">
+        Drag and drop a folder of DICOM files here, or click to select a folder.
+        <input type="file" id="dicom-file" style="display: none;" webkitdirectory directory>
+    </div>
+
+    <h2>2. Select or Upload Deid Recipe</h2>
+    <select id="recipe-select">
+        <option value="">-- Select a standard recipe --</option>
+    </select>
+    <p>Or upload your own recipe:</p>
+    <input type="file" id="recipe-file">
+    <br><br>
+    <textarea id="deid-recipe" rows="10" cols="80" placeholder="...or paste your deid recipe here..."></textarea>
+
+    <br>
+
+    <button id="run-button">Run Deid and Save Zip</button>
+
+    <h2>Results</h2>
+    <div id="results-container">
+        <div id="status">Ready.</div>
+        <div id="progress-bar-container">
+            <div id="progress-bar">0%</div>
+        </div>
+        <pre id="error-log"></pre>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/streamsaver@2.0.6/StreamSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate/umd/index.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
