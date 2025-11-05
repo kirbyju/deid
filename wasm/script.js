@@ -15,25 +15,31 @@ let selectedFiles = [];
 // --- Initialization ---
 
 async function main() {
-    statusDiv.textContent = 'Loading Pyodide...';
-    pyodide = await loadPyodide();
-    statusDiv.textContent = 'Pyodide loaded. Installing deid...';
+    try {
+        statusDiv.textContent = 'Loading Pyodide...';
+        pyodide = await loadPyodide();
+        statusDiv.textContent = 'Pyodide loaded. Installing deid...';
 
-    await pyodide.loadPackage('micropip');
-    const micropip = pyodide.pyimport('micropip');
+        await pyodide.loadPackage('micropip');
+        const micropip = pyodide.pyimport('micropip');
 
-    await micropip.install([
-        'deid-0.4.7-py3-none-any.whl',
-        'pydicom',
-        'numpy',
-        'python-dateutil'
-    ]);
+        await micropip.install([
+            'deid-0.4.7-py3-none-any.whl',
+            'pydicom',
+            'numpy',
+            'python-dateutil'
+        ]);
 
-    await populateRecipes();
-    statusDiv.textContent = 'Ready. Please select a DICOM folder and a recipe.';
+        await populateRecipes();
+        statusDiv.textContent = 'Ready. Please select a DICOM folder and a recipe.';
+    } catch (error) {
+        statusDiv.textContent = 'Initialization Error.';
+        errorLogPre.textContent = `An error occurred during setup: ${error.stack}`;
+    }
 }
 
 async function populateRecipes() {
+    // ... (rest of the function is unchanged)
     const pythonCode = `
 import os
 import json
@@ -72,7 +78,7 @@ get_deid_recipes()
 }
 
 // --- Event Handlers ---
-
+// ... (event handlers are unchanged)
 runButton.addEventListener('click', processFilesWithStreaming);
 recipeFileInput.addEventListener('change', handleRecipeFileUpload);
 dropZone.addEventListener('click', () => dicomFileInput.click());
@@ -157,120 +163,103 @@ function handleRecipeFileUpload(event) {
         reader.readAsText(file);
     }
 }
-
-// --- Core Logic with Streaming ---
+// --- Core Logic with Error Handling ---
 
 async function processFilesWithStreaming() {
-    const deidRecipe = deidRecipeTextarea.value;
-
-    if (selectedFiles.length === 0 || !deidRecipe) {
-        statusDiv.textContent = 'Error: Please select a folder and provide a recipe.';
-        return;
-    }
-
     runButton.disabled = true;
     errorLogPre.textContent = '';
-    let errorLog = "";
-    let filesProcessed = 0;
+    statusDiv.textContent = 'Starting process...';
 
-    const fileStream = streamSaver.createWriteStream('deidentified_dicom.zip');
-    const zipStream = new fflate.Zip((err, data, final) => {
-        if (!err) {
-            writer.write(data);
-            if (final) writer.close();
-        } else {
-            writer.abort(err);
+    try {
+        const deidRecipe = deidRecipeTextarea.value;
+        if (selectedFiles.length === 0 || !deidRecipe) {
+            throw new Error('Please select a folder and provide a recipe.');
         }
-    });
-    const writer = fileStream.getWriter();
 
-    const pythonCode = `
-import sys
-import os
-import shutil
-from deid.dicom import clean_dicom_files
+        let errorLog = "";
+        let filesProcessed = 0;
 
-def process_single_file(input_path, recipe_content):
-    output_dir = "/cleaned"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+        const fileStream = streamSaver.createWriteStream('deidentified_dicom.zip');
+        const zipStream = new fflate.Zip((err, data, final) => {
+            if (!err) {
+                writer.write(data);
+                if (final) writer.close();
+            } else {
+                writer.abort(err);
+            }
+        });
+        const writer = fileStream.getWriter();
 
-    recipe_path = "deid.recipe"
-    with open(recipe_path, 'w') as f:
-        f.write(recipe_content)
+        const pythonCode = `
+import io
+from pydicom import dcmread
+from deid.config import DeidRecipe
+from deid.dicom import replace_identifiers
 
+def process_dicom_in_memory(dicom_bytes, recipe_content):
     try:
-        cleaned_files = clean_dicom_files(
-            dicom_files=[input_path],
-            deid=recipe_path,
-            output_folder=output_dir,
-            force=True
-        )
+        recipe = DeidRecipe(recipe_content)
+        dicom_file = dcmread(io.BytesIO(dicom_bytes), force=True)
+        replace_identifiers(dicom_file=dicom_file, deid=recipe)
 
-        if cleaned_files:
-            output_path = cleaned_files[0]
-            if os.path.exists(output_path):
-                with open(output_path, 'rb') as f:
-                    return f.read()
-        return "Error: Cleaned file not found."
-
+        mem_file = io.BytesIO()
+        dicom_file.save_as(mem_file)
+        mem_file.seek(0)
+        return mem_file.read()
     except Exception as e:
-        return f"Error: {str(e)}"
-    finally:
-        # Clean up virtual files
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        if os.path.exists(recipe_path):
-            os.remove(recipe_path)
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
-    `;
-    await pyodide.runPythonAsync(pythonCode);
-    const process_single_file = pyodide.globals.get('process_single_file');
+        # Return a dictionary with an error key
+        return {"error": str(e)}
+        `;
+        await pyodide.runPythonAsync(pythonCode);
+        const process_dicom_in_memory = pyodide.globals.get('process_dicom_in_memory');
 
-    for (const file of selectedFiles) {
-        const filePath = file.webkitRelativePath || file.name;
-        statusDiv.textContent = `Processing: ${filePath}`;
+        for (const file of selectedFiles) {
+            const filePath = file.webkitRelativePath || file.name;
+            statusDiv.textContent = `Processing: ${filePath}`;
 
-        const buffer = await file.arrayBuffer();
-        const data = new Uint8Array(buffer);
+            const buffer = await file.arrayBuffer();
+            const data = new Uint8Array(buffer);
 
-        const dir = filePath.substring(0, filePath.lastIndexOf('/'));
-        if (dir) {
-            pyodide.FS.mkdirTree(dir);
-        }
-        pyodide.FS.writeFile(filePath, data);
+            // The Python function now returns a proxy
+            const resultProxy = await process_dicom_in_memory(data, deidRecipe);
 
-        const result = await process_single_file(filePath, deidRecipe);
+            if (resultProxy instanceof Uint8Array) {
+                const zipFile = new fflate.ZipPassThrough(filePath);
+                zipStream.add(zipFile);
+                zipFile.push(resultProxy);
+                zipFile.push(new Uint8Array(0), true);
+            } else {
+                // If it's not a byte array, it must be an error object
+                const result = resultProxy.toJs();
+                const errorMessage = `Error processing ${filePath}: ${result.get('error')}`;
+                console.error(errorMessage);
+                errorLog += errorMessage + '\n\n';
+                resultProxy.destroy();
+            }
 
-        if (result instanceof Uint8Array) {
-            const zipFile = new fflate.ZipPassThrough(filePath);
-            zipStream.add(zipFile);
-            zipFile.push(result);
-            zipFile.push(new Uint8Array(0), true);
-        } else {
-            const errorMessage = `Error processing ${filePath}: ${result}`;
-            console.error(errorMessage);
-            errorLog += errorMessage + '\n\n';
+            filesProcessed++;
+            const progress = Math.round((filesProcessed / selectedFiles.length) * 100);
+            progressBar.style.width = `${progress}%`;
+            progressBar.textContent = `${progress}%`;
         }
 
-        filesProcessed++;
-        const progress = Math.round((filesProcessed / selectedFiles.length) * 100);
-        progressBar.style.width = `${progress}%`;
-        progressBar.textContent = `${progress}%`;
-    }
+        if (errorLog) {
+            const errorFile = new fflate.ZipPassThrough('processing_errors.log');
+            zipStream.add(errorFile);
+            errorFile.push(new TextEncoder().encode(errorLog));
+            errorFile.push(new Uint8Array(0), true);
+            errorLogPre.textContent = errorLog;
+        }
 
-    if (errorLog) {
-        const errorFile = new fflate.ZipPassThrough('processing_errors.log');
-        zipStream.add(errorFile);
-        errorFile.push(new TextEncoder().encode(errorLog));
-        errorFile.push(new Uint8Array(0), true);
-        errorLogPre.textContent = errorLog;
+        zipStream.end();
+        statusDiv.textContent = `Processing complete. Zip file saved. ${filesProcessed - errorLog.split('\n\n').filter(Boolean).length}/${filesProcessed} files successful.`;
+    } catch (error) {
+        statusDiv.textContent = 'A critical error occurred.';
+        errorLogPre.textContent = `Please report this issue:\n\n${error.stack}`;
+        console.error(error);
+    } finally {
+        runButton.disabled = false;
     }
-
-    zipStream.end();
-    statusDiv.textContent = `Processing complete. Zip file saved. ${filesProcessed - errorLog.split('\n\n').filter(Boolean).length}/${filesProcessed} files successful.`;
-    runButton.disabled = false;
 }
 
 // --- Start the application ---
