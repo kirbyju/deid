@@ -196,8 +196,11 @@ from pydicom import dcmread
 from deid.config import DeidRecipe
 from deid.dicom import replace_identifiers
 
-def process_dicom_in_memory(dicom_bytes, recipe_content):
+def process_dicom_in_memory(dicom_data_proxy, recipe_content):
     try:
+        # Explicitly convert the JsProxy to a Python bytes object
+        dicom_bytes = dicom_data_proxy.to_bytes()
+
         recipe = DeidRecipe(recipe_content)
         dicom_file = dcmread(io.BytesIO(dicom_bytes), force=True)
         replace_identifiers(dicom_file=dicom_file, deid=recipe)
@@ -207,7 +210,6 @@ def process_dicom_in_memory(dicom_bytes, recipe_content):
         mem_file.seek(0)
         return mem_file.read()
     except Exception as e:
-        # Return a dictionary with an error key
         return {"error": str(e)}
         `;
         await pyodide.runPythonAsync(pythonCode);
@@ -215,12 +217,19 @@ def process_dicom_in_memory(dicom_bytes, recipe_content):
 
         for (const file of selectedFiles) {
             const filePath = file.webkitRelativePath || file.name;
+
+            // Skip non-DICOM files
+            if (!filePath.toLowerCase().endsWith('.dcm')) {
+                statusDiv.textContent = `Skipping non-DICOM file: ${filePath}`;
+                filesProcessed++;
+                continue;
+            }
+
             statusDiv.textContent = `Processing: ${filePath}`;
 
             const buffer = await file.arrayBuffer();
             const data = new Uint8Array(buffer);
 
-            // The Python function now returns a proxy
             const resultProxy = await process_dicom_in_memory(data, deidRecipe);
 
             if (resultProxy instanceof Uint8Array) {
@@ -229,7 +238,6 @@ def process_dicom_in_memory(dicom_bytes, recipe_content):
                 zipFile.push(resultProxy);
                 zipFile.push(new Uint8Array(0), true);
             } else {
-                // If it's not a byte array, it must be an error object
                 const result = resultProxy.toJs();
                 const errorMessage = `Error processing ${filePath}: ${result.get('error')}`;
                 console.error(errorMessage);
