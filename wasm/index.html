@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>deid</title>
+</head>
+<body>
+    <h1>deid</h1>
+    <p>
+        This is a pyodide-based interface to de-identify DICOM files.
+        The main Github repository is <a href="https://github.com/pydicom/deid" target="_blank">here</a>.
+    </p>
+
+    <p><strong><a href="https://pydicom.github.io/deid/getting_started/deid-recipes/">Deid Recipes</a></strong></p>
+    <p>Please choose a deid recipe, or load your own.</p>
+    <select id="recipe-select">
+        <option value="deid.dicom">deid.dicom</option>
+        <option value="deid.dicom-groups">deid.dicom-groups</option>
+    </select>
+    <br><br>
+    <textarea id="recipe-text" rows="10" cols="50"></textarea>
+    <br><br>
+    <input type="file" id="recipe-file">
+    <br><br>
+
+    <p><strong>DICOM Directory</strong></p>
+    <p>Please select a directory of DICOM files to de-identify.</p>
+    <input type="file" id="dicom-folder" webkitdirectory directory>
+    <br><br>
+    <button id="run-button">Run deid</button>
+
+    <p><strong>Progress</strong></p>
+    <progress id="progress-bar" value="0" max="100"></progress>
+    <p id="progress-text"></p>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/streamsaver@2.0.6/StreamSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
