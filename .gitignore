@@ -43,5 +43,3 @@ Temporary Items
 # PyCharm
 .idea/
 *.log
-/test_dicom_data
-/venv-pydicom-deid

@@ -13,19 +13,15 @@ This directory contains a web-based interface for the `deid` library, built usin
 
 ## How to Run
 
-1.  **Navigate to this directory:**
-    ```bash
-    cd wasm
-    ```
+1.  **Navigate to the repository root directory.**
 
 2.  **Start the local web server:**
-    **Important:** The server must be run from the `wasm` directory as shown below. This ensures that the application can correctly load the default deid recipes.
     ```bash
-    python server.py
+    python wasm/server.py
     ```
 
 3.  **Open the web interface:**
-    Open your web browser and go to `http://localhost:8000`.
+    Open your web browser and go to `http://localhost:8000/wasm/`.
 
 ## Technical Details
 

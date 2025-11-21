@@ -22,13 +22,17 @@ async function main() {
     const pyodide = await loadPyodide();
 
     // Pyodide can't directly install packages with complex dependencies like pydicom.
-    // We use micropip to handle the installation of deid and its dependencies.
     progressText.textContent = 'Installing Python packages...';
-    await pyodide.loadPackage('micropip');
-    const micropip = pyodide.globals.get('micropip');
 
-    // Install the essential dependencies. We install the local wheel for deid.
-    await micropip.install(['pydicom', 'python-dateutil', 'numpy', './deid-0.4.8-py3-none-any.whl']);
+    // Load the micropip package into the Pyodide environment
+    await pyodide.loadPackage('micropip');
+
+    // Run the install from inside Python
+    await pyodide.runPythonAsync(`
+    import micropip
+    # Install the essential dependencies, including the local wheel for deid
+    await micropip.install(['pydicom', 'python-dateutil', 'numpy', './deid-0.4.8-py3-none-any.whl'])
+    `);
 
     // Load our custom Python script into the Pyodide environment.
     const deidWasmCode = await fetch('deid-wasm.py').then(res => res.text());

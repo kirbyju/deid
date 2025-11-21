@@ -21,5 +21,5 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 # Start the web server.
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print(f"Serving at port {PORT}")
-    print("Open http://localhost:8000 in your browser.")
+    print("Open http://localhost:8000/wasm/ in your browser.")
     httpd.serve_forever()
