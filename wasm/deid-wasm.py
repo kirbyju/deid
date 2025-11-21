@@ -13,7 +13,7 @@ import js
 # They will be installed by Pyodide using micropip.
 import pydicom
 from deid.config import DeidRecipe
-from deid.dicom.actions import apply_actions
+from deid.dicom.parser import DicomParser
 
 
 def deidentify_file(file_bytes, recipe_text, file_path):
@@ -40,8 +40,16 @@ def deidentify_file(file_bytes, recipe_text, file_path):
         # Read the DICOM dataset. `force=True` helps with non-standard files.
         dataset = pydicom.dcmread(dicom_file, force=True)
 
-        # Apply the de-identification actions based on the recipe.
-        cleaned_dataset, _ = apply_actions(dataset=dataset, deid=recipe)
+        # Apply the de-identification actions based on the recipe using DicomParser.
+        parser = DicomParser(
+            dicom_file=dataset,
+            recipe=recipe,
+            force=True,
+            disable_skip=False,
+        )
+        parser.parse(strip_sequences=False, remove_private=False)
+
+        cleaned_dataset = parser.dicom
 
         # Save the modified dataset to an in-memory buffer.
         output_buffer = io.BytesIO()
