@@ -25,10 +25,10 @@ async function main() {
     // We use micropip to handle the installation of deid and its dependencies.
     progressText.textContent = 'Installing Python packages...';
     await pyodide.loadPackage('micropip');
-    const micropip = pyodide.pkgw_get('micropip');
+    const micropip = pyodide.globals.get('micropip');
 
-    // Install the required packages. This might take a moment.
-    await micropip.install(['pydicom', 'deid']);
+    // Install the essential dependencies. We install the local wheel for deid.
+    await micropip.install(['pydicom', 'python-dateutil', 'numpy', './deid-0.4.8-py3-none-any.whl']);
 
     // Load our custom Python script into the Pyodide environment.
     const deidWasmCode = await fetch('deid-wasm.py').then(res => res.text());
@@ -127,8 +127,7 @@ async function main() {
     // Function to load the content of the selected default recipe into the textarea.
     const loadRecipe = async () => {
         const recipeName = recipeSelect.value;
-        // Use a path relative to the root of the server.
-        const response = await fetch(`/examples/deid/${recipeName}`);
+        const response = await fetch(`../examples/deid/${recipeName}`);
         if (response.ok) {
             const text = await response.text();
             recipeText.value = text;
